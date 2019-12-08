@@ -1,0 +1,5 @@
+To run:
+
+  npm install
+  in one console: node server
+  in as many other consoles: node client
