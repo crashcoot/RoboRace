@@ -12,7 +12,7 @@ var move = {
 
 var players = {};
 
-var goal = {};
+var goals = {};
 
 var myPlayer = {
 
@@ -31,9 +31,10 @@ socket.on('connect', function () {
 
 socket.on('update', function(data) {
     //console.log(JSON.parse(data));
-    players = JSON.parse(data).players
-    goal = JSON.parse(data).goal
-    board.size = JSON.parse(data).size
+    players = JSON.parse(data).players;
+    goals = JSON.parse(data).goals;
+    board.size = JSON.parse(data).size;
+    goalCount = JSON.parse(data).goalCount;
     Object.keys(players).forEach(function (id) {
         if (players[id].playerId === myId) {
           myPlayer = players[id]
@@ -41,12 +42,11 @@ socket.on('update', function(data) {
     });
     console.clear();
     PrintBoard();
-    MakeMove(myPlayer, goal);
+    MakeMove(myPlayer, GetClosestGoal());
 });
 
 
 function MakeMove(p, g) {
-    //console.log(p.x);
     if (p.x < g.x) {
         move.dx = 1;
     }
@@ -77,9 +77,11 @@ function PrintBoard() {
                     printed = true;
                 }
             });
-            if (goal.x == x && goal.y == y && !printed) {
-                boardString += "O";
-                printed = true;
+            for (var i = 0; i < goalCount; i++) {
+                if (goals[i].x == x && goals[i].y == y && !printed) {
+                    boardString += "O";
+                    printed = true;
+                }
             }
             if (!printed) {
                 boardString += "-"
@@ -90,4 +92,20 @@ function PrintBoard() {
         
     }
     console.log(boardString);
-}     
+    console.log("Points:" + myPlayer.points);
+}
+
+function GetClosestGoal() {
+    var closestGoal = goals[0];
+    for (var i = 0; i < goalCount; i++) {
+        //console.log("Distance to Goal " + i + ": " + GetDistance(myPlayer.x, myPlayer.y, goals[i].x, goals[i].y));
+        if (GetDistance(myPlayer.x, myPlayer.y, goals[i].x, goals[i].y) < GetDistance(myPlayer.x, myPlayer.y, closestGoal.x, closestGoal.y)) {
+            closestGoal = goals[i];
+        }
+    }
+    return closestGoal;
+}
+
+function GetDistance(x1, y1, x2, y2){
+    return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
+}

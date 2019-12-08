@@ -3,13 +3,21 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-
-var g = {x:5, y:5}
-
 var board = {
-    goal: g, 
+    goals: {}, 
+    goalCount: 5,
     players: {},
     size: 25
+}
+
+//initialize goals
+for (var i = 0; i < board.goalCount; i++) {
+    board.goals[i] = {x:0, y:0};
+    NewGoal(i);
+}
+
+for (var i = 0; i < board.goalCount; i++) {
+    console.log(board.goals[i])
 }
 
 setInterval(function(){ 
@@ -21,7 +29,8 @@ io.on('connection', function (socket){
    board.players[socket.id] = {
        x: Math.floor(Math.random()*board.size),
        y: Math.floor(Math.random()*board.size),
-       playerId: socket.id
+       playerId: socket.id,
+       points: 0
    }
 
     // when a player disconnects, remove them from our players object
@@ -59,13 +68,17 @@ http.listen(3000, function () {
 
 function CheckGoalCollision() {
     Object.keys(board.players).forEach(function (id) {
-        if (board.players[id].x == board.goal.x && board.players[id].y == board.goal.y) {
-            NewGoal();
+        for (var i = 0; i < board.goalCount; i++) {
+            if (board.players[id].x == board.goals[i].x && board.players[id].y == board.goals[i].y) {
+                board.players[id].points += 1;
+                NewGoal(i);
+            }
         }
+        
     });
 }
 
-function NewGoal() {
-    board.goal.x = Math.floor(Math.random()*board.size)
-    board.goal.y = Math.floor(Math.random()*board.size)
+function NewGoal(i) {
+    board.goals[i].x = Math.floor(Math.random()*board.size)
+    board.goals[i].y = Math.floor(Math.random()*board.size)
 }
