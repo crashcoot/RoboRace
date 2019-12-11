@@ -3,6 +3,9 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var io2 = require('socket.io-client');
+var socket2 = io2.connect('http://localhost:8080', {reconnect: true});
+
 var board = {
     goals: {}, 
     goalCount: 5,
@@ -21,7 +24,8 @@ for (var i = 0; i < board.goalCount; i++) {
 
 //Send an update to all connected sockets every 10ms
 setInterval(function(){ 
-    io.sockets.emit('update', JSON.stringify(board)); 
+    io.sockets.emit('update', JSON.stringify(board));
+    socket2.emit('update', JSON.stringify(board));
  }, 20);
 
  //Update the leaderboard every second
