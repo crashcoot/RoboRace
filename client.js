@@ -1,50 +1,41 @@
 //client.js
 var io = require('socket.io-client');
 var socket = io.connect('http://localhost:3000', {reconnect: true});
+
+var name = "YOUR NAME HERE";
+
 var myId;
-
 var board = {};
-
 var move = {
     dx: 0,
     dy: 0
 }
-
 var players = {};
-
 var goals = {};
-
-var myPlayer = {
-
-}
-
-var id;
+var myPlayer = {}
+var leaderboard;
 
 // Add a connect listener
 socket.on('connect', function () {
     console.log('Connected!');
     myId = socket.id;
+    socket.emit("rename", name);
 });
-
-
-
 
 socket.on('update', function(data) {
     //console.log(JSON.parse(data));
-    players = JSON.parse(data).players;
-    goals = JSON.parse(data).goals;
-    board.size = JSON.parse(data).size;
-    goalCount = JSON.parse(data).goalCount;
-    Object.keys(players).forEach(function (id) {
-        if (players[id].playerId === myId) {
-          myPlayer = players[id]
-        }
-    });
+    board = JSON.parse(data);
+    players = board.players;
+    goals = board.goals;
+    board.size = board.size;
+    goalCount = board.goalCount;
+    myPlayer = players[myId];
+    leaderboard = board.leaderboard;
     console.clear();
     PrintBoard();
+    PrintStats();
     MakeMove(myPlayer, GetClosestGoal());
 });
-
 
 function MakeMove(p, g) {
     if (p.x < g.x) {
@@ -63,7 +54,6 @@ function MakeMove(p, g) {
     move.dx = 0;
     move.dy = 0;
 }
-
 
 function PrintBoard() {
     size = board.size;
@@ -92,7 +82,16 @@ function PrintBoard() {
         
     }
     console.log(boardString);
+    
+}
+
+function PrintStats() {
     console.log("Points:" + myPlayer.points);
+    console.log("Moves:" + myPlayer.moves);
+    console.log(" ");
+    console.log(board.leaderboard);
+    console.log(" ");
+    console.log("Previous Winner: " + board.winnerName + ": " + board.winnerScore);
 }
 
 function GetClosestGoal() {
