@@ -11,9 +11,9 @@ var board = {
     goalCount: 5,
     players: {},
     size: 25,
-    leaderboard: "",
     winnerScore: "",
     winnerName: 0,
+    winnerColor: 'red',
 }
 
 //initialize goals
@@ -39,7 +39,8 @@ io.on('connection', function (socket){
        y: Math.floor(Math.random()*board.size),
        playerId: socket.id,
        points: 0,
-       moves: 0
+       moves: 0,
+       color: "red",
    }
     //Set name of player to desired name
     socket.on("rename", function (name) {
@@ -62,7 +63,7 @@ io.on('connection', function (socket){
 
     socket.on('move', function (e) {
         var move = JSON.parse(e);
-        console.log(move);
+        //console.log(move);
         var col = false;
         Object.keys(board.players).forEach(function (id) {
             if (board.players[socket.id].x+move.dx == board.players[id].x && board.players[socket.id].y+move.dy == board.players[id].y) {
@@ -101,13 +102,14 @@ function NewGoal(i) {
 }
 
 function NewGame() {
-    var winnerName = "";
+    board.winnerName = "";
     Object.keys(board.players).forEach(function (id) { 
-        if (winnerName == "") {
+        if (board.winnerName == "") {
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
         }
-        if (board.players[id].moves/board.players[id].points < board.winnerScore) {
+        if (board.players[id].moves/board.players[id].points < board.winnerScore || board.winnerScore == null) {
+            console.log("new winner");
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
         }

@@ -45,6 +45,7 @@ function drawcanvas1() {
     Object.keys(board.players).forEach(function (id) {
         context.fillStyle = board.players[id].color;;
         context.fillRect(board.players[id].x*canvas1.height/board.size,board.players[id].y*canvas1.height/board.size,canvas1.width/board.size,canvas1.height/board.size);
+        context.fillStyle = "red";
     });
 
     //Goals
@@ -86,9 +87,10 @@ function updateLeaderboard() {
     context.fillStyle = "black";
     context.fillText("Previous Winner", 400, 50);
     if (board.winnerScore > 0) {
+        context.fillStyle = board.winnerColor;
         context.fillText(board.winnerName + ": " + Number(board.winnerScore).toFixed(2), 400+indent, border+80);
     } else {
         context.fillText("No Winner", 400+indent, border+80);
     }
-    
+    context.fillStyle = "black";
 }
