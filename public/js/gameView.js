@@ -8,8 +8,8 @@ var board = {
     goalCount: 0,
     players: {},
     size: 0,
-    winnerScore: '',
-    winnerName: 0
+    winnerScore: 0,
+    winnerName: ''
 }
 
 socket.on('relay', function(data) {
@@ -43,7 +43,7 @@ function drawcanvas1() {
 
     //Players
     Object.keys(board.players).forEach(function (id) {
-        context.fillStyle = "red";
+        context.fillStyle = board.players[id].color;;
         context.fillRect(board.players[id].x*canvas1.height/board.size,board.players[id].y*canvas1.height/board.size,canvas1.width/board.size,canvas1.height/board.size);
     });
 
@@ -73,6 +73,7 @@ function updateLeaderboard() {
     var border = 10;
     var playerCount = 0;
     Object.keys(board.players).forEach(function (id) {
+        context.fillStyle = board.players[id].color;
         if (board.players[id].points == 0) {
             context.fillText(board.players[id].name + ": No Points", indent, playerCount*30+border+80);
         } else {
@@ -82,6 +83,12 @@ function updateLeaderboard() {
     });
 
     //Previous winner
+    context.fillStyle = "black";
     context.fillText("Previous Winner", 400, 50);
-    context.fillText(board.winnerName + ": " + board.winnerScore.toFixed(2), 400+indent, border+80);
+    if (board.winnerScore > 0) {
+        context.fillText(board.winnerName + ": " + Number(board.winnerScore).toFixed(2), 400+indent, border+80);
+    } else {
+        context.fillText("No Winner", 400+indent, border+80);
+    }
+    
 }

@@ -13,6 +13,7 @@ app.get('/', function (req, res) {
 io.sockets.on('connection', function (socket) {
     console.log("Server connected");
     socket.on('update', function(data) {
+        console.log(JSON.parse(data))
         io.sockets.emit('relay', data);
     });
 });

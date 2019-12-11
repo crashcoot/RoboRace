@@ -2,7 +2,8 @@
 var io = require('socket.io-client');
 var socket = io.connect('http://localhost:3000', {reconnect: true});
 
-var name = "YOUR NAME";
+var name = "YOUR_NAME"; //No spaces
+var color = "green";
 var print = false;
 
 var myId;
@@ -20,6 +21,7 @@ socket.on('connect', function () {
     console.log('Connected!');
     myId = socket.id;
     socket.emit("rename", name);
+    socket.emit("recolor", color);
 });
 
 socket.on('update', function(data) {

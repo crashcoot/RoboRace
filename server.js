@@ -41,10 +41,13 @@ io.on('connection', function (socket){
        points: 0,
        moves: 0
    }
-   //Set name of player to desired name
-   socket.on("rename", function (name) {
-        board.players[socket.id].name = name;
-   });
+    //Set name of player to desired name
+    socket.on("rename", function (name) {
+        board.players[socket.id].name = name.replace(/ /g, '_'); //removes spaces
+    });
+    socket.on("recolor", function (color) {
+        board.players[socket.id].color = color;
+    });
 
     // when a player disconnects, remove them from our players object
     socket.on('disconnect', function () {
