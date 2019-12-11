@@ -86,6 +86,7 @@ function PrintBoard() {
 }
 
 function PrintStats() {
+    console.log("Name: " + myPlayer.name);
     console.log("Points:" + myPlayer.points);
     console.log("Moves:" + myPlayer.moves);
     console.log(" ");

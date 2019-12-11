@@ -22,7 +22,7 @@ for (var i = 0; i < board.goalCount; i++) {
 //Send an update to all connected sockets every 10ms
 setInterval(function(){ 
     io.sockets.emit('update', JSON.stringify(board)); 
- }, 10);
+ }, 20);
 
  //Update the leaderboard every second
 setInterval(function() {
@@ -31,7 +31,7 @@ setInterval(function() {
 
 setInterval(function() {
     NewGame();
-}, 60000*.1); //Set multiplier to desired game minutes
+}, 60000*.15); //Set multiplier to desired game minutes
 
 io.on('connection', function (socket){
    console.log('connection');
@@ -100,8 +100,12 @@ function NewGoal(i) {
 
 function UpdateLeaderBoard() {
     board.leaderboard = "Avg Moves per Point:\n";
-    Object.keys(board.players).forEach(function (id) { 
-        board.leaderboard += board.players[id].name + ": " + (board.players[id].moves/board.players[id].points) + "\n";
+    Object.keys(board.players).forEach(function (id) {
+        if (board.players[id].points == 0) {
+            board.leaderboard += board.players[id].name + ": No Points\n";
+        } else {
+            board.leaderboard += board.players[id].name + ": " + (board.players[id].moves/board.players[id].points) + "\n";
+        }
     });
 }
 
@@ -109,6 +113,10 @@ function NewGame() {
     var winnerName = "";
     Object.keys(board.players).forEach(function (id) { 
         if (winnerName == "") {
+            board.winnerName = board.players[id].name;
+            board.winnerScore = board.players[id].moves/board.players[id].points;
+        }
+        if (board.players[id].moves/board.players[id].points < board.winnerScore) {
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
         }
@@ -123,4 +131,5 @@ function NewGame() {
         board.players[id].x = Math.floor(Math.random()*board.size);
         board.players[id].y = Math.floor(Math.random()*board.size);
     });
+    UpdateLeaderBoard();
 }
