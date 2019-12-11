@@ -1,8 +1,9 @@
 //client.js
 var io = require('socket.io-client');
-var socket = io.connect('http://localhost:8080', {reconnect: true});
+var socket = io.connect('http://localhost:3000', {reconnect: true});
 
-var name = "YOUR NAME HERE";
+var name = "YOUR NAME";
+var print = false;
 
 var myId;
 var board = {};
@@ -13,7 +14,6 @@ var move = {
 var players = {};
 var goals = {};
 var myPlayer = {}
-var leaderboard;
 
 // Add a connect listener
 socket.on('connect', function () {
@@ -30,10 +30,11 @@ socket.on('update', function(data) {
     board.size = board.size;
     goalCount = board.goalCount;
     myPlayer = players[myId];
-    leaderboard = board.leaderboard;
-    console.clear();
-    PrintBoard();
-    PrintStats();
+    if (print) {
+        console.clear();
+        PrintBoard();
+        PrintStats();
+    }
     MakeMove(myPlayer, GetClosestGoal());
 });
 
@@ -89,8 +90,6 @@ function PrintStats() {
     console.log("Name: " + myPlayer.name);
     console.log("Points:" + myPlayer.points);
     console.log("Moves:" + myPlayer.moves);
-    console.log(" ");
-    console.log(board.leaderboard);
     console.log(" ");
     console.log("Previous Winner: " + board.winnerName + ": " + board.winnerScore);
 }

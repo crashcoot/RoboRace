@@ -28,11 +28,6 @@ setInterval(function(){
     socket2.emit('update', JSON.stringify(board));
  }, 20);
 
- //Update the leaderboard every second
-setInterval(function() {
-    UpdateLeaderBoard();
-}, 1000);
-
 setInterval(function() {
     NewGame();
 }, 60000*.15); //Set multiplier to desired game minutes
@@ -102,17 +97,6 @@ function NewGoal(i) {
     board.goals[i].y = Math.floor(Math.random()*board.size)
 }
 
-function UpdateLeaderBoard() {
-    board.leaderboard = "Avg Moves per Point:\n";
-    Object.keys(board.players).forEach(function (id) {
-        if (board.players[id].points == 0) {
-            board.leaderboard += board.players[id].name + ": No Points\n";
-        } else {
-            board.leaderboard += board.players[id].name + ": " + (board.players[id].moves/board.players[id].points) + "\n";
-        }
-    });
-}
-
 function NewGame() {
     var winnerName = "";
     Object.keys(board.players).forEach(function (id) { 
@@ -135,5 +119,4 @@ function NewGame() {
         board.players[id].x = Math.floor(Math.random()*board.size);
         board.players[id].y = Math.floor(Math.random()*board.size);
     });
-    UpdateLeaderBoard();
 }
