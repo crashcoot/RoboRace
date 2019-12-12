@@ -14,7 +14,10 @@ var board = {
     winnerScore: "",
     winnerName: 0,
     winnerColor: 'red',
+    winnerId: "",
 }
+
+var connections = {}
 
 //initialize goals
 for (var i = 0; i < board.goalCount; i++) {
@@ -23,7 +26,10 @@ for (var i = 0; i < board.goalCount; i++) {
 }
 
 //Send an update to all connected sockets every 10ms
-setInterval(function(){ 
+setInterval(function(){
+    Object.keys(board.players).forEach(function (id) {
+        board.players[id].moved = false;
+    });
     io.sockets.emit('update', JSON.stringify(board));
     socket2.emit('update', JSON.stringify(board));
  }, 20);
@@ -34,21 +40,30 @@ setInterval(function() {
 
 io.on('connection', function (socket){
    console.log('connection');
-   board.players[socket.id] = {
-       x: Math.floor(Math.random()*board.size),
-       y: Math.floor(Math.random()*board.size),
-       playerId: socket.id,
-       points: 0,
-       moves: 0,
-       color: "red",
+   if (connections[socket.request.connection.remoteAddress] == null) {
+    connections[socket.request.connection.remoteAddress] = {count: 1}
+   } else {
+    connections[socket.request.connection.remoteAddress].count += 1;
    }
-    //Set name of player to desired name
-    socket.on("rename", function (name) {
-        board.players[socket.id].name = name.replace(/ /g, '_'); //removes spaces
-    });
-    socket.on("recolor", function (color) {
-        board.players[socket.id].color = color;
-    });
+   if (connections[socket.request.connection.remoteAddress].count < 10) {
+    board.players[socket.id] = {
+        x: Math.floor(Math.random()*board.size),
+        y: Math.floor(Math.random()*board.size),
+        playerId: socket.id,
+        points: 0,
+        moves: 0,
+        color: "red",
+        wins: 0,
+        moved: false,
+    }
+     //Set name of player to desired name
+     socket.on("rename", function (name) {
+         board.players[socket.id].name = name.replace(/ /g, '_'); //removes spaces
+     });
+     socket.on("recolor", function (color) {
+         board.players[socket.id].color = color;
+     });
+   }
 
     // when a player disconnects, remove them from our players object
     socket.on('disconnect', function () {
@@ -62,20 +77,35 @@ io.on('connection', function (socket){
     
 
     socket.on('move', function (e) {
-        var move = JSON.parse(e);
-        //console.log(move);
-        var col = false;
-        Object.keys(board.players).forEach(function (id) {
-            if (board.players[socket.id].x+move.dx == board.players[id].x && board.players[socket.id].y+move.dy == board.players[id].y) {
-                col = true;
+        if (!board.players[socket.id].moved) {
+            var move = JSON.parse(e);
+            if (move.dx > 0 ) {
+                move.dx = 1;
             }
-        });
-        if (!col) {
-            board.players[socket.id].x += move.dx;
-            board.players[socket.id].y += move.dy;
+            if (move.dx < 0) {
+                move.dx = -1;
+            }
+            if (move.dy > 0 ) {
+                move.dy = 1;
+            }
+            if (move.dy < 0) {
+                move.dy = -1;
+            }
+            //console.log(move);
+            board.players[socket.id].moved = true;
+            var col = false;
+            Object.keys(board.players).forEach(function (id) {
+                if (board.players[socket.id].x+move.dx == board.players[id].x && board.players[socket.id].y+move.dy == board.players[id].y) {
+                    col = true;
+                }
+            });
+            if (!col) {
+                board.players[socket.id].x += move.dx;
+                board.players[socket.id].y += move.dy;
+            }
+            board.players[socket.id].moves += 1;
+            CheckGoalCollision();
         }
-        board.players[socket.id].moves += 1;
-        CheckGoalCollision();
     });
 
 });
@@ -103,18 +133,25 @@ function NewGoal(i) {
 
 function NewGame() {
     board.winnerName = "";
-    Object.keys(board.players).forEach(function (id) { 
+    Object.keys(board.players).forEach(function (id) {
+        
+    });
+
+    Object.keys(board.players).forEach(function (id) {
         if (board.winnerName == "") {
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
             board.winnerColor = board.players[id].color;
+            board.winnerId = id;
         }
         if (board.players[id].moves/board.players[id].points < board.winnerScore || board.winnerScore == null) {
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
             board.winnerColor = board.players[id].color;
+            board.winnerId = id
         }
     });
+    board.players[board.winnerId].wins++;
     for (var i = 0; i < board.goalCount; i++) {
         board.goals[i] = {x:0, y:0, id:i};
         NewGoal(i);

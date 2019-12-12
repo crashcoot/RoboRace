@@ -20,6 +20,8 @@ socket.on('relay', function(data) {
 });
 
 
+
+
 function drawcanvas1() {
     const context = canvas1.getContext("2d");
 
@@ -76,9 +78,9 @@ function updateLeaderboard() {
     Object.keys(board.players).forEach(function (id) {
         context.fillStyle = board.players[id].color;
         if (board.players[id].points == 0) {
-            context.fillText(board.players[id].name + ": No Points", indent, playerCount*30+border+80);
+            context.fillText(board.players[id].wins + " " + board.players[id].name + ": No Points", indent, playerCount*30+border+80);
         } else {
-            context.fillText(board.players[id].name + ": " + (board.players[id].moves/board.players[id].points).toFixed(2), indent, playerCount*30+border+80);
+            context.fillText(board.players[id].wins + " " + board.players[id].name + ": " + (board.players[id].moves/board.players[id].points).toFixed(2), indent, playerCount*30+border+80);
         }
         playerCount++;
     });
