@@ -1,6 +1,6 @@
 //client.js
 var io = require('socket.io-client');
-var socket = io.connect('http://localhost:3000', {reconnect: true});
+var socket = io.connect('http://108.162.166.200:50000/', {reconnect: true});
 
 var name = "YOUR_NAME"; //No spaces
 var color = "green";

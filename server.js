@@ -4,10 +4,10 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var io2 = require('socket.io-client');
-var socket2 = io2.connect('http://localhost:8080', {reconnect: true});
+var socket2 = io2.connect('http://localhost:50001', {reconnect: true});
 
 var board = {
-    goals: {}, 
+    goals: [5], 
     goalCount: 5,
     players: {},
     size: 25,
@@ -18,7 +18,7 @@ var board = {
 
 //initialize goals
 for (var i = 0; i < board.goalCount; i++) {
-    board.goals[i] = {x:0, y:0};
+    board.goals[i] = {x:0, y:0, id:i};
     NewGoal(i);
 }
 
@@ -80,8 +80,8 @@ io.on('connection', function (socket){
 
 });
 
-http.listen(3000, function () {
-  console.log('listening on *:3000');
+http.listen(50000, function () {
+  console.log('listening on *:50000');
 });
 
 function CheckGoalCollision() {
@@ -107,15 +107,16 @@ function NewGame() {
         if (board.winnerName == "") {
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
+            board.winnerColor = board.players[id].color;
         }
         if (board.players[id].moves/board.players[id].points < board.winnerScore || board.winnerScore == null) {
-            console.log("new winner");
             board.winnerName = board.players[id].name;
             board.winnerScore = board.players[id].moves/board.players[id].points;
+            board.winnerColor = board.players[id].color;
         }
     });
     for (var i = 0; i < board.goalCount; i++) {
-        board.goals[i] = {x:0, y:0};
+        board.goals[i] = {x:0, y:0, id:i};
         NewGoal(i);
     }
     Object.keys(board.players).forEach(function (id) { 

@@ -1,4 +1,4 @@
-socket = io('http://localhost:8080');
+socket = io('http://108.162.166.200:50001/');
 
 let canvas1 = document.getElementById("canvas1");
 let canvas2 = document.getElementById("canvas2");
