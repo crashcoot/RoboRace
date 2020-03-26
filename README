@@ -1,5 +1,17 @@
+The purpose of this project is to show a basic online game where automation of character controls is encouraged, instead of being a bannable offense. 
+Objectives are distributed on the gameboard, and any connected clients are given JSON data with the gameboard information.
+It's up to the players to write a program that will read the data, determine how to move next, and emit with their character's movement to the server.
+
+A starting client that seeks out the closest objective is provided. Start by changing the name and color.
+
+This is a basic example to show the potential of games played using automated character movement. It's also meant to be a starting point for future games with much more complex rules, objectives, and moves that programmers would have to handle.
+
 To run:
 
   npm install
-  in one console: node server
-  in as many other consoles: node client
+  in one console: "node server"
+  in as many other consoles: "node client"
+
+  The clients are now connected to the server, and are exchanging JSON data to race agaisnt each other.
+
+To see a view of the race, run "node relay" and go to localhost:50001 in a browser.
