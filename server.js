@@ -151,7 +151,9 @@ function NewGame() {
             board.winnerId = id
         }
     });
-    board.players[board.winnerId].wins++;
+    if (board.players[board.winnerId] != null) {
+        board.players[board.winnerId].wins++;
+    }
     for (var i = 0; i < board.goalCount; i++) {
         board.goals[i] = {x:0, y:0, id:i};
         NewGoal(i);
